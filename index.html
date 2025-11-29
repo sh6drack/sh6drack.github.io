@@ -465,5 +465,100 @@ Claude AI          MCP Protocol</code>
   <h2>Know thyself</h2>
 </div>
 
+<!-- WAITLIST -->
+<div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+  <div style="max-width: 500px;">
+    <span class="label" style="margin-bottom: 30px; display: block;">Coming Soon</span>
+    <h1 style="font-size: 72px; margin-bottom: 20px;">JOIN THE<br>WAITLIST</h1>
+    <p style="margin-bottom: 40px; opacity: 0.4;">Be the first to map your mind</p>
+
+    <form id="waitlist-form" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+      <input
+        type="email"
+        name="email"
+        placeholder="your@email.com"
+        required
+        style="
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          padding: 16px 24px;
+          font-size: 16px;
+          color: #fff;
+          font-family: inherit;
+          width: 280px;
+          outline: none;
+          transition: border-color 0.2s;
+        "
+        onfocus="this.style.borderColor='#4ECDC4'"
+        onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+      >
+      <button
+        type="submit"
+        style="
+          background: linear-gradient(135deg, #4ECDC4, #45B7AA);
+          border: none;
+          border-radius: 8px;
+          padding: 16px 32px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #000;
+          font-family: inherit;
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          transition: transform 0.2s, box-shadow 0.2s;
+        "
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(78,205,196,0.3)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+      >
+        Notify Me
+      </button>
+    </form>
+
+    <p id="form-message" style="margin-top: 20px; opacity: 0; transition: opacity 0.3s;"></p>
+
+    <p style="margin-top: 60px; opacity: 0.2; font-size: 14px;">polarity-lab.com</p>
+  </div>
+</div>
+
+<script>
+  document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const message = document.getElementById('form-message');
+    const button = form.querySelector('button');
+
+    button.textContent = '...';
+    button.disabled = true;
+
+    try {
+      // Using Formspree - create account at formspree.io and replace with your form ID
+      const response = await fetch('https://formspree.io/f/xwpkgjvr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (response.ok) {
+        message.textContent = "You're on the list. We'll be in touch.";
+        message.style.opacity = '1';
+        message.style.color = '#4ECDC4';
+        form.email.value = '';
+      } else {
+        throw new Error('Failed');
+      }
+    } catch (err) {
+      message.textContent = 'Something went wrong. Try again.';
+      message.style.opacity = '1';
+      message.style.color = '#FFA07A';
+    }
+
+    button.textContent = 'Notify Me';
+    button.disabled = false;
+  });
+</script>
+
 </body>
 </html>
