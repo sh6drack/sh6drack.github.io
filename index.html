@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="POLARITY - Your AI Exocortex. Map your brain, know yourself.">
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <title>POLARITY</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,20 +257,27 @@
       text-align: left;
     }
 
-    /* Orbital icon */
-    .orbital-icon {
-      position: absolute;
-      top: clamp(30px, 5vw, 70px);
-      left: clamp(30px, 5vw, 90px);
-      width: clamp(30px, 5vw, 60px);
-      height: clamp(30px, 5vw, 60px);
-      opacity: 0.2;
-      animation: spin 30s linear infinite;
+    /* Logo */
+    .logo {
+      position: fixed;
+      top: max(20px, env(safe-area-inset-top, 20px));
+      left: max(20px, env(safe-area-inset-left, 20px));
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 100;
     }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    .logo img {
+      width: clamp(32px, 5vw, 48px);
+      height: clamp(32px, 5vw, 48px);
+    }
+
+    .logo span {
+      font-weight: 700;
+      font-size: clamp(11px, 1.5vw, 14px);
+      letter-spacing: 0.15em;
+      opacity: 0.7;
     }
 
     /* FORM STYLES */
@@ -482,16 +489,15 @@
 </head>
 <body>
 
+<div class="logo">
+  <img src="icon.svg" alt="Polarity">
+  <span>POLARITY</span>
+</div>
+
 <div class="container">
 
 <!-- SLIDE 1: Title -->
 <div class="slide">
-  <svg class="orbital-icon" viewBox="0 0 100 100">
-    <ellipse cx="50" cy="50" rx="40" ry="12" fill="none" stroke="#4ECDC4" stroke-width="2" transform="rotate(-60 50 50)"/>
-    <ellipse cx="50" cy="50" rx="40" ry="12" fill="none" stroke="#FFA07A" stroke-width="2" transform="rotate(60 50 50)"/>
-    <ellipse cx="50" cy="50" rx="40" ry="12" fill="none" stroke="#BB8FCE" stroke-width="2"/>
-    <circle cx="50" cy="50" r="10" fill="#4ECDC4"/>
-  </svg>
   <span class="num">01</span>
   <span class="label">AI Exocortex</span>
   <h1>POLARITY</h1>
