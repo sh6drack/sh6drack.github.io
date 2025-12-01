@@ -478,8 +478,8 @@
       }
     }
 
-    /* Slide bar navigation */
-    .slidebar {
+    /* Progress indicator */
+    .progress-indicator {
       position: fixed;
       right: max(16px, env(safe-area-inset-right, 16px));
       top: 50%;
@@ -488,101 +488,82 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 8px;
-      touch-action: none;
-    }
-
-    .slidebar-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #4ECDC4;
-      margin-bottom: 8px;
-      text-align: right;
-      transition: opacity 0.2s;
-    }
-
-    .slidebar-track {
-      width: 4px;
-      height: 180px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .slidebar-progress {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: linear-gradient(to bottom, #4ECDC4, #45B7AA);
-      border-radius: 4px;
-      transition: height 0.15s ease-out;
-    }
-
-    .slidebar-thumb {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 14px;
-      height: 14px;
-      background: #4ECDC4;
-      border-radius: 50%;
-      box-shadow: 0 0 12px rgba(78, 205, 196, 0.6);
-      cursor: grab;
-      transition: transform 0.1s, box-shadow 0.2s;
-    }
-
-    .slidebar-thumb:active {
-      cursor: grabbing;
-      transform: translate(-50%, -50%) scale(1.2);
-      box-shadow: 0 0 20px rgba(78, 205, 196, 0.8);
-    }
-
-    .slidebar-ticks {
-      position: absolute;
-      top: 0;
-      left: -8px;
-      width: 20px;
-      height: 100%;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
       pointer-events: none;
     }
 
-    .slidebar-tick {
-      position: absolute;
-      left: 0;
-      width: 6px;
-      height: 2px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 1px;
+    .progress-indicator.visible {
+      opacity: 1;
     }
 
-    /* Mobile adjustments */
+    .progress-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      text-align: right;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .progress-dots {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 6px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .progress-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: all 0.3s;
+    }
+
+    .progress-dot.active {
+      background: #4ECDC4;
+      box-shadow: 0 0 8px rgba(78, 205, 196, 0.5);
+    }
+
+    /* Mobile */
     @media (max-width: 480px) {
-      .slidebar {
+      .progress-indicator {
         right: 10px;
       }
-      .slidebar-track {
-        height: 140px;
-      }
-      .slidebar-label {
+      .progress-label {
         font-size: 9px;
+        padding: 5px 8px;
+      }
+      .progress-dot {
+        width: 5px;
+        height: 5px;
+      }
+      .progress-dots {
+        gap: 5px;
+        padding: 6px 5px;
       }
     }
   </style>
 </head>
 <body>
 
-<nav class="slidebar" id="slidebar">
-  <div class="slidebar-label" id="slidebar-label">Intro</div>
-  <div class="slidebar-track" id="slidebar-track">
-    <div class="slidebar-progress" id="slidebar-progress"></div>
-    <div class="slidebar-thumb" id="slidebar-thumb"></div>
-    <div class="slidebar-ticks" id="slidebar-ticks"></div>
-  </div>
-</nav>
+<div class="progress-indicator" id="progress">
+  <div class="progress-label" id="progress-label">Intro</div>
+  <div class="progress-dots" id="progress-dots"></div>
+</div>
 
 <div class="container" id="container">
 
@@ -1028,14 +1009,12 @@ Railway (Cloud)    Supabase Auth</code>
     }
   });
 
-  // Slidebar navigation
+  // Progress indicator
   const slides = document.querySelectorAll('.slide');
   const container = document.getElementById('container');
-  const track = document.getElementById('slidebar-track');
-  const thumb = document.getElementById('slidebar-thumb');
-  const progress = document.getElementById('slidebar-progress');
-  const labelEl = document.getElementById('slidebar-label');
-  const ticksContainer = document.getElementById('slidebar-ticks');
+  const progressEl = document.getElementById('progress');
+  const labelEl = document.getElementById('progress-label');
+  const dotsContainer = document.getElementById('progress-dots');
 
   const sections = [
     { start: 0, end: 3, label: 'Intro' },
@@ -1047,83 +1026,53 @@ Railway (Cloud)    Supabase Auth</code>
     { start: 26, end: 26, label: 'Join' }
   ];
 
-  const totalSlides = slides.length;
-
-  // Create tick marks for each section
+  // Create dots for each section
   sections.forEach((section, i) => {
-    const tick = document.createElement('div');
-    tick.className = 'slidebar-tick';
-    tick.style.top = `${(section.start / (totalSlides - 1)) * 100}%`;
-    ticksContainer.appendChild(tick);
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if (i === 0) dot.classList.add('active');
+    dotsContainer.appendChild(dot);
   });
 
-  function getLabel(slideIndex) {
-    for (const section of sections) {
-      if (slideIndex >= section.start && slideIndex <= section.end) {
-        return section.label;
+  const dots = dotsContainer.querySelectorAll('.progress-dot');
+  let hideTimeout;
+  let currentSection = 0;
+
+  function getSectionIndex(slideIndex) {
+    for (let i = 0; i < sections.length; i++) {
+      if (slideIndex >= sections[i].start && slideIndex <= sections[i].end) {
+        return i;
       }
     }
-    return 'Intro';
+    return 0;
   }
 
-  function updateSlider(slideIndex) {
-    const pct = slideIndex / (totalSlides - 1);
-    const trackHeight = track.offsetHeight;
-    const thumbPos = pct * trackHeight;
-    thumb.style.top = `${thumbPos}px`;
-    progress.style.height = `${thumbPos}px`;
-    labelEl.textContent = getLabel(slideIndex);
+  function updateProgress(slideIndex) {
+    const sectionIndex = getSectionIndex(slideIndex);
+    if (sectionIndex !== currentSection) {
+      currentSection = sectionIndex;
+      labelEl.textContent = sections[sectionIndex].label;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === sectionIndex);
+      });
+    }
   }
 
-  // Scroll updates slider
+  function showProgress() {
+    progressEl.classList.add('visible');
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+      progressEl.classList.remove('visible');
+    }, 1500);
+  }
+
   container.addEventListener('scroll', () => {
     const scrollPos = container.scrollTop;
     const windowHeight = window.innerHeight;
     const currentSlide = Math.round(scrollPos / windowHeight);
-    updateSlider(currentSlide);
+    updateProgress(currentSlide);
+    showProgress();
   }, { passive: true });
-
-  // Drag thumb to scroll
-  let isDragging = false;
-
-  function startDrag(e) {
-    isDragging = true;
-    e.preventDefault();
-  }
-
-  function doDrag(e) {
-    if (!isDragging) return;
-    const rect = track.getBoundingClientRect();
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
-    const pct = y / rect.height;
-    const slideIndex = Math.round(pct * (totalSlides - 1));
-    slides[slideIndex].scrollIntoView({ behavior: 'auto' });
-  }
-
-  function endDrag() {
-    isDragging = false;
-  }
-
-  thumb.addEventListener('mousedown', startDrag);
-  thumb.addEventListener('touchstart', startDrag, { passive: false });
-  document.addEventListener('mousemove', doDrag);
-  document.addEventListener('touchmove', doDrag, { passive: false });
-  document.addEventListener('mouseup', endDrag);
-  document.addEventListener('touchend', endDrag);
-
-  // Click on track to jump
-  track.addEventListener('click', (e) => {
-    if (e.target === thumb) return;
-    const rect = track.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const pct = y / rect.height;
-    const slideIndex = Math.round(pct * (totalSlides - 1));
-    slides[slideIndex].scrollIntoView({ behavior: 'smooth' });
-  });
-
-  // Initialize
-  updateSlider(0);
 </script>
 
 </body>
